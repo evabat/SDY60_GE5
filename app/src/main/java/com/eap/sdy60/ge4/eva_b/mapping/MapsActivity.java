@@ -161,11 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 showCategoryLevelDialog();
-//                totalMeters = calculateTotalMeters();
-//                if (totalMeters > 500) {
-//                    pointsTxtView.setVisibility(View.VISIBLE);
-//                    pointsTxtView.setText("Πόντοι: " + totalMeters);
-//                }
             }
         });
 
