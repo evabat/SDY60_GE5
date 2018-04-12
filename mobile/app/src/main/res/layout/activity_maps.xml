@@ -1,0 +1,117 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.NoTitleBar"
+    tools:context="com.eap.sdy60.ge4.eva_b.mapping.MapsActivity">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/category_level"
+                android:layout_width="145dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorcategoryTxtBg"
+                android:padding="5dp"
+                android:text="@string/category_level_text_label"
+                android:textColor="@color/colorcategoryTxt"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/user_points"
+                android:layout_width="145dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPointsTxtBg"
+                android:padding="5dp"
+                android:text="@string/user_points_text_label"
+                android:textColor="@color/colorPointsTxt"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="60dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/endbtn"
+            android:drawableStart="@drawable/endicon"
+            android:paddingBottom="10dp"
+            android:paddingEnd="12dp"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/end_button_label"
+            android:textAlignment="textEnd"
+            android:textColor="@color/colorWhite"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="18dp"
+            android:layout_marginStart="18dp"
+            android:background="@drawable/deletepointbtn"
+            android:drawableStart="@drawable/undoicon"
+            android:paddingBottom="10dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/delete_button_label"
+            android:textColor="@color/colorDeleteButtonTxt" />
+
+        <Button
+            android:id="@+id/btnPutPoint"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="18dp"
+            android:layout_marginEnd="18dp"
+            android:background="@drawable/putpointbtn"
+            android:drawableStart="@drawable/putpointicon"
+            android:paddingBottom="10dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/put_point_button_label"
+            android:textColor="@color/colorPutPointButtonTxt" />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/startbtn"
+            android:drawableStart="@drawable/starticon"
+            android:paddingBottom="10dp"
+            android:paddingEnd="12dp"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/start_button_label"
+            android:textAlignment="textEnd"
+            android:textColor="@color/colorWhite"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</FrameLayout>

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "567713343657",
+    "firebase_url": "https://mapping-5e694.firebaseio.com",
+    "project_id": "mapping-5e694",
+    "storage_bucket": "mapping-5e694.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567713343657:android:56c91200afbc6e38",
+        "android_client_info": {
+          "package_name": "com.eap.sdy60.ge4.eva_b.mapping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "567713343657-jo0koplldppmtj1g3m91letkqh602g2s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV_AkdX-3L0VnFWGsyJ42JoqNqPeqs-Bw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
