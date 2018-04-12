@@ -1,0 +1,219 @@
+<html>
+    <head>
+        <title>ΣΔΥ60 ΓΕ-5</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="./theme/default/style.mobile.css" type="text/css">
+        <link rel="stylesheet" href="./theme/default/style.css" type="text/css">
+        <script src="./OpenLayers.js"></script>
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+            }
+            #map {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+			#save{
+				position: absolute;
+				top:50px;
+				right:0px;
+				background-color:lightgreen;
+				border-radius: 5px;
+			}
+			#get{
+				position: absolute;
+				top:80px;
+				right:0px;
+				background-color:lightgreen;
+				border-radius: 5px;
+			}
+			#clearall{
+				position: absolute;
+				top:110px;
+				right:0px;
+				background-color:lightgreen;
+				border-radius: 5px;
+			}
+			#undo{
+				position: absolute;
+				top:5px;
+				right:105px;
+				background-color:lightblue;
+				border-radius: 5px;
+			}
+            .olControlAttribution {
+                font-size: 10px;
+                bottom: 5px;
+                right: 5px;
+            }
+            .olControlEditingToolbar .olControlModifyFeatureItemInactive {
+                background-position: -1px -1px;
+            }
+            .olControlEditingToolbar .olControlModifyFeatureItemActive {
+                background-position: -1px -24px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+		
+		<button id="save" onclick="savedraw()">Save Paths</button>
+		<button id="get" onclick="getpath()">&nbspGet Paths&nbsp</button>
+		<button id="undo" onclick="undo()">undo</button>
+		<button id="clearall" onclick="clearall()">&nbspClear Map</button>
+
+<script src="https://www.gstatic.com/firebasejs/4.8.0/firebase.js"></script>
+<script>
+  // Αρχικοποίηση Firebase
+  var config = {
+    apiKey: "AIzaSyAtmbUQcmXeU5LhUlwlK2zjfGsb6kFh2EU",
+    authDomain: "geo-matrix.firebaseapp.com",
+    databaseURL: "https://geo-matrix.firebaseio.com",
+    projectId: "geo-matrix",
+    storageBucket: "geo-matrix.appspot.com",
+    messagingSenderId: "836779096364"
+  };
+  firebase.initializeApp(config);
+</script>		
+<script>
+
+	// Ορισμός επιπέδου που θα χρησιμοποιηθεί για την εμφάνιση των διαδρομών καθώς σχεδιάζονται
+	//Θα χρησιμπποιηθεί σαν επίπεδο προσωρινής αποθήκευσης
+    var vector = new OpenLayers.Layer.Vector('Vector Layer', {
+        styleMap: new OpenLayers.StyleMap({
+            temporary: OpenLayers.Util.applyDefaults({
+                pointRadius: 16
+            }, OpenLayers.Feature.Vector.style.temporary),
+            'default': OpenLayers.Util.applyDefaults({
+                pointRadius: 10,
+                strokeWidth: 2,
+            }, OpenLayers.Feature.Vector.style['default']),
+            select: OpenLayers.Util.applyDefaults({
+                pointRadius: 16,				
+                strokeWidth: 2
+            }, OpenLayers.Feature.Vector.style.select)
+        })
+    });
+	//Ορισμός επιπέδου για την εμφάνιση των αποθηκευμένων στην βάση διαδρομών
+	  var vector2 = new OpenLayers.Layer.Vector('Vector Layer', {
+        styleMap: new OpenLayers.StyleMap({
+            temporary: OpenLayers.Util.applyDefaults({
+                pointRadius: 12
+            }, OpenLayers.Feature.Vector.style.temporary),
+            'default': OpenLayers.Util.applyDefaults({
+                pointRadius: 12,
+				strokeColor: '#006aff',
+                strokeWidth: 3,
+            }, OpenLayers.Feature.Vector.style['default']),
+            select: OpenLayers.Util.applyDefaults({
+                pointRadius: 12,
+				strokeColor: '#006aff',
+                strokeWidth: 3
+            }, OpenLayers.Feature.Vector.style.select)
+        })
+    });
+
+	//Συνάρτηση αρχικοποίησης της εφαρμογής
+	function init() {
+    var toolbar = new OpenLayers.Control.Panel({
+        displayClass: 'olControlEditingToolbar'
+    });
+    toolbar.addControls([
+        //Προσθήκη στον χάρτη της toolbar των drawing tools
+        new OpenLayers.Control({
+            displayClass: 'olControlNavigation'
+        }),
+        new OpenLayers.Control.ModifyFeature(vector, {
+            vertexRenderIntent: 'temporary',
+            displayClass: 'olControlModifyFeature'
+        }),
+        new OpenLayers.Control.DrawFeature(vector, OpenLayers.Handler.Path, {
+            displayClass: 'olControlDrawFeaturePath'
+        }),
+    ]);
+	//ορισμός επιπέδου χάρτη OpenStreetMap
+	
+			var wms = new OpenLayers.Layer.WMS('Ktimatologio WMS','http://gis.ktimanet.gr/wms/wmsopen/wmsserver.aspx',
+		{format: 'image/png', layers: 'baselayer', transparent: "false", antialias: 'full', opacity: 0.0});
+		
+  //  var osm = new OpenLayers.Layer.OSM();
+    //osm.wrapDateLine = false;
+	//Ορισμός των παραμέτρων εμφάνισης του χάρτη
+    map = new OpenLayers.Map({
+        div: 'map',
+        projection: 'EPSG:900913',
+        numZoomLevels: 22,
+        controls: [
+            new OpenLayers.Control.Navigation(),
+            new OpenLayers.Control.Zoom(),
+            toolbar
+        ],
+        layers: [wms, vector, vector2],
+        center: new OpenLayers.LonLat(2639506.3023867, 4581393.6516845),
+        zoom: 16,
+        theme: null
+    });
+
+    //Ενεργοποίηση του toolbar
+    toolbar.controls[0].activate();
+	}
+    //Συνάρτηση αποθήκευσης των διαδρομών	
+	function savedraw(){
+	var features='';
+	var ft = vector.features;//Αποθήκευση των features σε μεταβλητή τύπου array
+	//Μετατροπή των features σε GeoJSON format
+	var geojson_format = new OpenLayers.Format.GeoJSON();
+    var features = geojson_format.write(ft, false);
+
+	if(ft.length>0){//Εάν το array δεν είναι κενό προχωρά στην αποθήκευση
+		firebase.database().ref('paths/' + Date.now()).update({features}, function(error) {
+		if (error) {//Έλεγχος για ολοκλήρψση της διαδικασίας
+			alert("Paths could not be saved." + error);//Εάν προκύψει σφάλμα εμφανίζεται κατάλληλο μήνυμα
+		}else{
+			alert("Paths saved successfully.");//Με την επιτυχή ολοκλήρωση εμφανίζεται κατάλληλο μήνυμα
+			for(i=0;i<ft.length;i++){
+			//Τα features που αποθηκεύτικαν επιτυχώς μεταφέρονται στο επίπεδο vector2
+				vector2.addFeatures(ft[i]);
+			}
+			//Διαγράφονται τα αποθηκευμένα features από το επίπεδο vector ώστε να μπορούν να σχεδιαστούν νέα από το χρήστη
+			vector.destroyFeatures();
+		}
+		});
+	}else{
+	//Εάν το array είναι κενό τότε ο χρήστης δεν έχει σχεδιάσει πρώτα μία τουλάχιστον διαδρομή. Εμφανίζεται κατάλληλο μήνυμα
+		alert("Draw a path first and then press save.");
+	}
+	}
+		
+	function undo(){
+	//Αφάιρεση του πιο πρόσφατα σχεδιασμένου feature στο επίπεδο vector
+		vector.removeFeatures(vector.features[vector.features.length-1]);
+	}
+		
+	function clearall(){
+	//Αφαίρεση όλωνβ το διαδρομών και από τα δύο επίπεδα
+			vector.destroyFeatures();
+			vector2.destroyFeatures();			
+	}
+	function getpath(){
+	//Ανάκτηση στοιχείων από τη Firebase
+	   firebase.database().ref().once("value", function(data) {
+	   //Ανάκτηση των εγγραφών και μορφοποίηση τους
+	   jsdata=JSON.stringify(data.val().paths);
+	   jsdata=jsdata.replace(/\\n/g, "");
+	   jsdata=jsdata.replace(/\\/g, "");
+	   jsdata=jsdata.replace(/\"/g, "");
+		//Εμφάνιση εγγραφών
+	   alert(jsdata);  
+    });
+	}
+
+	init();	//Αρχικοποίηση της εφαρμογής
+</script>
+</body>
+</html>
