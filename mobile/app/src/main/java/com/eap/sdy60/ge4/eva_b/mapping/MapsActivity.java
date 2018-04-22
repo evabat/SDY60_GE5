@@ -211,9 +211,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         disableDeleteButton(false);
                         prevDbLoc = currLoc;
 
-                        if (arrayPoints.size() > 3) {
-                            endBtn.setVisibility(View.VISIBLE);
-                        }
                     }
                 });
             }
@@ -498,10 +495,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mDb.child(mUserKey).child(mPathKey).push().setValue(mPoint, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseErr, DatabaseReference dbRef) {
-                        // Show put point button, hide start button
+                        // Show put point button, delete point button, end record button and hide start button
                         startBtn.setVisibility(View.GONE);
                         putPointBtn.setVisibility(View.VISIBLE);
                         deletePointBtn.setVisibility(View.VISIBLE);
+                        endBtn.setVisibility(View.VISIBLE);
                     }
                 });
             }
