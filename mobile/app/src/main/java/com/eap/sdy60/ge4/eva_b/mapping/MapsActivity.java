@@ -870,8 +870,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         alertDialog.setPositiveButton("ΟΛΟΚΛΗΡΩΣΗ", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 startBtn.setVisibility(View.VISIBLE);
-                putPointBtn.setVisibility((View.GONE));
-                deletePointBtn.setVisibility((View.GONE));
+                putPointBtn.setVisibility(View.GONE);
+                endBtn.setVisibility(View.GONE);
+                deletePointBtn.setVisibility(View.GONE);
                 disableDeleteButton(true);
                 mMap.clear();
                 arrayPoints.clear();
