@@ -31,7 +31,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="60dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:background="@drawable/endbtn"
             android:drawableStart="@drawable/endicon"
             android:paddingBottom="10dp"
@@ -39,9 +39,10 @@
             android:paddingStart="10dp"
             android:paddingTop="10dp"
             android:text="@string/end_button_label"
-            android:textAlignment="textEnd"
             android:textColor="@color/colorWhite"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textAlignment="center"/>
 
         <Button
             android:id="@+id/btnDelete"
@@ -58,7 +59,9 @@
             android:paddingStart="10dp"
             android:paddingTop="10dp"
             android:text="@string/delete_button_label"
-            android:textColor="@color/colorDeleteButtonTxt" />
+            android:textColor="@color/colorDeleteButtonTxt"
+            android:gravity="center"
+            android:textAlignment="center"/>
 
         <Button
             android:id="@+id/btnPutPoint"
@@ -75,7 +78,9 @@
             android:paddingStart="10dp"
             android:paddingTop="10dp"
             android:text="@string/put_point_button_label"
-            android:textColor="@color/colorPutPointButtonTxt" />
+            android:textColor="@color/colorPutPointButtonTxt"
+            android:gravity="center"
+            android:textAlignment="center"/>
 
         <Button
             android:id="@+id/btnStart"
@@ -91,8 +96,10 @@
             android:paddingStart="10dp"
             android:paddingTop="10dp"
             android:text="@string/start_button_label"
-            android:textAlignment="textEnd"
             android:textColor="@color/colorWhite"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textAlignment="center"
+            />
     </RelativeLayout>
 </FrameLayout>

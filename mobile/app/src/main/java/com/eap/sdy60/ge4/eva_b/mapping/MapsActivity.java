@@ -604,7 +604,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         int pathType = 0;
                         ArrayList<LatLng> pathArr = new ArrayList<>();
                         int i = 0;
-                        if (pathSnapshot.child("typeInt") != null) {
+                        if (pathSnapshot.child("typeInt") != null && pathSnapshot.child("typeInt").getValue() != null) {
                             pathType = Integer.parseInt(pathSnapshot.child("typeInt").getValue().toString());
                         }
                         for (DataSnapshot pointSnapshot : pathSnapshot.getChildren()) {
