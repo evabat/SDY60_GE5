@@ -10,5 +10,8 @@
     <string name="radio_on_foot">1/3: Πεζή/πεζός </string>
     <string name="radio_bicycle">2/3: Με ποδήλατο</string>
     <string name="radio_baby_cart">3/3:  Με παιδικό καρότσι</string>
+    <string name="menu_option1_text">Προβολή διαδρομών</string>
+    <string name="menu_option2_text">Προβολή δεδομένων χρήστη"</string>
+    <string name="menu_option3_text">Ερωτηματολόγιο</string>
     <string name="end_path_confirmation_text">Είστε σίγουροι ότι θέλετε να ολοκληρώσετε την παρούσα καταγραφή;</string>
 </resources>

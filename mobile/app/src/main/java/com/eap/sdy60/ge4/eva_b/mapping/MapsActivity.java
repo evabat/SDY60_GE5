@@ -5,12 +5,14 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -20,9 +22,15 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +58,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Temporary data
     private ArrayList<LatLng> arrayPoints = new ArrayList<LatLng>();
+    public String selKey;
 
     // Buttons
     Button startBtn;
@@ -74,11 +84,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button putPointBtn;
     Button deletePointBtn;
 
-    // Points view
-    TextView pointsTxtView;
-
-    // Level view
-    TextView levelTxtView;
 
     // Polyline stuff
     PolylineOptions polylineOptions;
@@ -120,8 +125,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // End path's recording confirmation dialog
     AlertDialog endPathConfirmationDialog;
 
+    // User information dialog (selected level and poits)
+    AlertDialog userInformationDialog;
+
     // Global value for current path type
     int pathLevel;
+
+    // List with custom class data (for the spinner)
+    List<StringWithTagAndArr> allPaths = new ArrayList<StringWithTagAndArr>();
+
+    // Spinner
+    Spinner pathsSpinner;
+
+    Boolean spinnerIsVisible = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,22 +157,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         putPointBtn = findViewById(R.id.btnPutPoint);
         deletePointBtn = findViewById(R.id.btnDelete);
 
-        // Get user points text view
-        pointsTxtView = findViewById(R.id.user_points);
-
-        // Get path level text view
-        levelTxtView = findViewById(R.id.category_level);
+        //Get the dropdown spinner
+        pathsSpinner = findViewById(R.id.spinner1);
 
         context = this;
         tinydb = new TinyDB(this);
         FirebaseApp.initializeApp(this);
         startBtn.setVisibility(View.GONE);
         endBtn.setVisibility(View.GONE);
-        putPointBtn.setVisibility((View.GONE));
-        deletePointBtn.setVisibility((View.GONE));
+        putPointBtn.setVisibility(View.GONE);
+        deletePointBtn.setVisibility(View.GONE);
+        pathsSpinner.setVisibility(View.GONE);
         disableDeleteButton(true);
 
-        levelTxtView.setVisibility(View.GONE);
 
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,10 +206,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (prevDbLoc != null) {
                             lastDistance = currLoc.distanceTo(prevDbLoc);
                             totalMeters += lastDistance;
-                            if (totalMeters > 500 && pointsTxtView.getVisibility() == View.GONE) {
-                                pointsTxtView.setText("Πόντοι: " + Math.round(totalMeters / 1000));
-                                pointsTxtView.setVisibility(View.VISIBLE);
-                            }
                         }
 
                         disableDeleteButton(false);
@@ -215,7 +225,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 mDb.child(mUserKey).child(mPathKey).child(tinydb.getString("lastPointKey")).removeValue();
                 totalMeters = totalMeters - lastDistance;
-                pointsTxtView.setText("Πόντοι: " + Math.round(totalMeters / 1000));
                 Marker marker = hashMapMarker.get("lastMarker");
                 marker.remove();
                 arrayPoints.remove(arrayPoints.size() - 1);
@@ -223,6 +232,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 disableDeleteButton(true);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_options, menu);
+        return true;
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -360,7 +376,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         //Initialize Google Play Services
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(5000); // 5 seconds interval
@@ -486,14 +502,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         startBtn.setVisibility(View.GONE);
                         putPointBtn.setVisibility(View.VISIBLE);
                         deletePointBtn.setVisibility(View.VISIBLE);
-                        levelTxtView.setText("Κατηγορία: " + pathTypeList.get(pathLevel).getProperty("level"));
-                        levelTxtView.setCompoundDrawablesWithIntrinsicBounds(0, 0, getResources().getIdentifier(pathTypeList.get(pathType).getProperty("icon"), "drawable", getPackageName()), 0);
-                        levelTxtView.setVisibility(View.VISIBLE);
                     }
                 });
             }
         });
-
     }
 
     void putMarker(LatLng point, String clr) {
@@ -562,9 +574,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             prevDbLoc = currLoc;
                         }
                     }
-                    levelTxtView.setText("Κατηγορία: " + pathTypeList.get(pathLevel).getProperty("level"));
-                    levelTxtView.setCompoundDrawablesWithIntrinsicBounds(0, 0, getResources().getIdentifier(pathTypeList.get(pathLevel).getProperty("icon"), "drawable", getPackageName()), 0);
-                    levelTxtView.setVisibility(View.VISIBLE);
                     drawPolyline(type);
                 }
             }
@@ -581,15 +590,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mDb.child(mUserKey).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // Reset the data
                 totalMeters = 0;
+                allPaths.clear();
+                // Add the first default choice
+                allPaths.add(new StringWithTagAndArr("Χωρίς επιλογή", "000", null, 0));
                 for (DataSnapshot pathSnapshot : dataSnapshot.getChildren()) {
                     // Calculate only the previous recorded paths, the current will be calculated by another function
                     if (pathSnapshot != null) {
                         float pathSum = 0;
                         Location prevLoc = new Location("location");
+                        // Get each path's key
+                        String pathKey = pathSnapshot.getKey();
+                        String pathName = "Nameless";
+                        int pathType = 0;
+                        ArrayList<LatLng> pathArr = new ArrayList<>();
+                        int i = 0;
+                        if (pathSnapshot.child("typeInt") != null) {
+                            pathType = Integer.parseInt(pathSnapshot.child("typeInt").getValue().toString());
+                        }
                         for (DataSnapshot pointSnapshot : pathSnapshot.getChildren()) {
+                            if (i == 0 && pointSnapshot.child("name") != null) {
+                                pathName = pointSnapshot.child("name").getValue(String.class);
+                            }
+
                             if (pointSnapshot.child("latLng").getValue() != null) {
                                 Location currLoc = new Location("location");
+                                LatLng currLatLng = new LatLng(Double.parseDouble(pointSnapshot.child("latLng").child("latitude").getValue().toString()), Double.parseDouble(pointSnapshot.child("latLng").child("longitude").getValue().toString()));
+                                pathArr.add(currLatLng);
                                 currLoc.setLatitude(Double.parseDouble(pointSnapshot.child("latLng").child("latitude").getValue().toString()));
                                 currLoc.setLongitude(Double.parseDouble(pointSnapshot.child("latLng").child("longitude").getValue().toString()));
                                 if (prevLoc.getLatitude() != 0 && prevLoc.getLongitude() != 0) {
@@ -597,14 +625,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                                 prevLoc = currLoc;
                             }
+                            i++;
                         }
                         totalMeters += pathSum;
-                        if (totalMeters > 500) {
-                            pointsTxtView.setText("Πόντοι: " + Math.round(totalMeters / 1000));
-                            pointsTxtView.setVisibility(View.VISIBLE);
-                        }
+                        // Add the options to the spinner in order to make them visible
+                        allPaths.add(new StringWithTagAndArr(pathName, pathKey, pathArr, pathType));
                     }
                 }
+
+                // Get the adapter that defines the spinner's options
+                ArrayAdapter<StringWithTagAndArr> pathsAdapter = new ArrayAdapter<StringWithTagAndArr>(getApplicationContext(), R.layout.spinner_text, allPaths);
+
+                // Set the spinner as dropdown item
+                pathsAdapter.setDropDownViewResource(R.layout.spinner_dropdown_text);
+                // Finally, set the composed paths as options
+                pathsSpinner.setAdapter(pathsAdapter);
+
+
+                // Event for making a selection at spinner
+                final Spinner selectionSpinner = findViewById(R.id.spinner1);
+                // On select!
+                selectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                        StringWithTagAndArr sel = (StringWithTagAndArr) parentView.getItemAtPosition(position);
+                        final Object tag = sel.tag;
+                        // The options are of the custom class "StringWithTagAndArr"
+                        // String = name, tag = key, Arr = array of coords, type = int that defines the path type
+                        final ArrayList<?> coords = sel.coords;
+                        final int typeInt = sel.type;
+
+                        // If the user selects the default option
+                        if (tag.equals("000")) {
+                            // Make the whole clear thing (data, temporary data, visual data, buttons)
+                            mMap.clear();
+                            arrayPoints.clear();
+                            selKey = null;
+                        } else {
+                            // Clear again the map and the data in order to load the user's choice
+                            mMap.clear();
+                            arrayPoints.clear();
+                            // Get the key
+                            selKey = (String) sel.tag;
+                            for (int i = 0; i < coords.size(); i++) {
+                                // Make some string arrangements in order to extract the data...
+                                String latLongStr = coords.get(i).toString();
+                                latLongStr = latLongStr.replace("lat/lng: (", "");
+                                latLongStr = latLongStr.replace(")", "");
+                                List<String> splitStr = Arrays.asList(latLongStr.split(","));
+                                String latStr = splitStr.get(0);
+                                String lonStr = splitStr.get(1);
+                                Double latDbl = Double.parseDouble(latStr);
+                                Double lonDbl = Double.parseDouble(lonStr);
+                                // We can finally define a LatLng!
+                                LatLng newPoint = new LatLng(latDbl, lonDbl);
+
+                                // Add the markers according to the path type and points
+                                String markerColor = pathTypeList.get(typeInt).getProperty("colorHex");
+                                putMarker(newPoint, markerColor);
+
+                                // Add the marker to the temporary array of points
+                                arrayPoints.add(newPoint);
+                            }
+                            // Draw the polyline!
+                            drawPolyline(typeInt);
+                            // Move map's camera to the center of the polyline
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(arrayPoints.get(arrayPoints.size() / 2), 14.0f));
+                        }
+                    }
+
+                    // This function does nothing
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parentView) {
+                        // Nothing needed here
+                    }
+
+                });
             }
 
             // On cancel
@@ -614,6 +710,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
+
 
     void disableDeleteButton(Boolean disabled) {
         Drawable drawable = getResources().getDrawable(R.drawable.undoicon);
@@ -628,10 +725,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.show_saved_paths:
+                arrangeSpinnerSelection(spinnerIsVisible, item);
+                return true;
+            case R.id.show_personal_data:
+                showUserInfoDialog();
+                return true;
+            case R.id.questionnaire:
+                String url = "https://goo.gl/forms/tT7Z8s1WkJ3r4x9E3";
+
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // Custom class for handling the data of the spinner
+    public class StringWithTagAndArr {
+        // The custom class consist of:
+        // String (Name)
+        public String string;
+        // Object (key) as tag
+        public Object tag;
+        // ArrayList of LatLng data for storing the points (markers)
+        public ArrayList<LatLng> coords;
+        // Integer (Type)
+        public int type;
+
+        // Declare the components of the class
+        public StringWithTagAndArr(String stringPart, Object tagPart, ArrayList arrPart, int typePart) {
+            string = stringPart;
+            tag = tagPart;
+            coords = arrPart;
+            type = typePart;
+        }
+
+        @Override
+        public String toString() {
+            return string;
+        }
+    }
+
+
     void showCategoryLevelDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
         final View selectionView = inflater.inflate(getResources().getIdentifier("level_selection", "layout", getPackageName()), null);
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, getResources().getIdentifier("levelSelectionDialogTheme", "style", getPackageName()));
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle("Επιλογή κατηγορίας της διαδρομής");
         alertDialog.setView(selectionView);
         alertDialog.setPositiveButton("ΚΑΤΑΓΡΑΦΗ", new DialogInterface.OnClickListener() {
@@ -661,19 +807,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    void arrangeSpinnerSelection(Boolean visible, MenuItem item) {
+        if (!visible) {
+            startBtn.setVisibility(View.GONE);
+            endBtn.setVisibility(View.GONE);
+            putPointBtn.setVisibility(View.GONE);
+            deletePointBtn.setVisibility(View.GONE);
+            pathsSpinner.setVisibility(View.VISIBLE);
+            mMap.clear();
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+            item.setTitle("Απόκρυψη διαδρομών");
+            spinnerIsVisible = true;
+        } else {
+            mMap.clear();
+            arrayPoints.clear();
+            if (mUserKey != null && mPathKey != null) {
+                getSavedPoints();
+            }
+            if (hashMapMarker.isEmpty()) {
+                disableDeleteButton(true);
+            }
+            pathsSpinner.setVisibility(View.GONE);
+            requestLocationListener();
+            item.setTitle("Προβολή διαδρομών");
+            spinnerIsVisible = false;
+        }
+    }
+
+    void showUserInfoDialog() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View userInfoView = inflater.inflate(getResources().getIdentifier("user_information", "layout", getPackageName()), null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Δεδομένα χρήστη");
+        alertDialog.setView(userInfoView);
+        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // Just close the dialog...
+            }
+        });
+        // Get user points text view
+        TextView pointsTxtView = userInfoView.findViewById(R.id.user_points);
+        pointsTxtView.setText("Πόντοι: " + Math.round(totalMeters / 300));
+
+        // Get path level text view
+        TextView levelTxtView = userInfoView.findViewById(R.id.category_level);
+        levelTxtView.setText("Κατηγορία: " + pathTypeList.get(pathLevel).getProperty("level")+ "/3");
+        levelTxtView.setCompoundDrawablesWithIntrinsicBounds(0, 0, getResources().getIdentifier(pathTypeList.get(pathLevel).getProperty("icon"), "drawable", getPackageName()), 0);
+
+        userInformationDialog = alertDialog.create();
+        if (!userInformationDialog.isShowing()) {
+            userInformationDialog.show();
+        }
+    }
+
+
     void showEndPathConfirmationDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
-        final View selectionView = inflater.inflate(getResources().getIdentifier("end_path_confirmation", "layout", getPackageName()), null);
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this, getResources().getIdentifier("endPathConfirmationDialogTheme", "style", getPackageName()));
+        final View confirmationView = inflater.inflate(getResources().getIdentifier("end_path_confirmation", "layout", getPackageName()), null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle("ΕΠΙΒΕΒΑΙΩΣΗ");
-        alertDialog.setView(selectionView);
+        alertDialog.setView(confirmationView);
         alertDialog.setPositiveButton("ΟΛΟΚΛΗΡΩΣΗ", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 startBtn.setVisibility(View.VISIBLE);
                 putPointBtn.setVisibility((View.GONE));
                 deletePointBtn.setVisibility((View.GONE));
                 disableDeleteButton(true);
-                levelTxtView.setVisibility(View.GONE);
                 mMap.clear();
                 arrayPoints.clear();
                 endBtn.setVisibility(View.GONE);
@@ -728,8 +927,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public ArrayList<PathType> createPathTypes(ArrayList<PathType> list) {
         PathType onFoot = new PathType();
         onFoot.setProperty("index", Integer.toString(0));
-        onFoot.setProperty("colorRgb", Integer.toString(Color.rgb(0, 255, 255)));
-        onFoot.setProperty("colorHex", "180.0f");
+        onFoot.setProperty("colorRgb", Integer.toString(Color.rgb(0, 0, 255)));
+        onFoot.setProperty("colorHex", "240.0f");
         onFoot.setProperty("level", "1");
         onFoot.setProperty("icon", "onfooticon");
 
