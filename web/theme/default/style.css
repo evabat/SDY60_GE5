@@ -385,7 +385,7 @@ span.olGoogleAttribution.hybrid a, span.olGoogleAttribution.satellite a {
     margin: 0 0 5px 5px;
     width: 24px;
     height: 22px;
-    cursor: pointer
+    cursor: pointer;
 }
 /* positions */
 .olControlEditingToolbar {

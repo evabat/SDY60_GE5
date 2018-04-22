@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <title>ΣΔΥ60 ΓΕ-5</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="./theme/default/style.mobile.css" type="text/css">
+        <link rel="stylesheet" href="./theme/default/style.css" type="text/css">
+        <script src="./OpenLayers.js"></script>
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                background-color: lightgrey;
+            }
+			#getfeat{
+                                margin: 0;
+                                padding: 0;
+                                height: 100px;
+                                width:100px;
+				background-color:lightgreen;
+				border-radius: 5px;
+			}
+			#getstat{
+                                margin: 0;
+                                padding: 0;
+                                height: 100px;
+                                width:100px;
+				background-color:lightgreen;
+				border-radius: 5px;
+			}
+                        #area{
+                                height:70%;
+                                width:70%;
+                        }
+
+        </style>
+    </head>
+    <body>
+		
+		<button id="getfeat" onclick="getpath()">Get Features</button>
+                <button id="getstat" onclick="getstats()">&nbspGet Statistics&nbsp</button><br><br>
+                <textarea id="area"></textarea>
+
+<script src="https://www.gstatic.com/firebasejs/4.8.0/firebase.js"></script>
+<script>
+  // Αρχικοποίηση Firebase
+  var config = {
+    apiKey: "AIzaSyAtmbUQcmXeU5LhUlwlK2zjfGsb6kFh2EU",
+    authDomain: "geo-matrix.firebaseapp.com",
+    databaseURL: "https://geo-matrix.firebaseio.com",
+    projectId: "geo-matrix",
+    storageBucket: "geo-matrix.appspot.com",
+    messagingSenderId: "836779096364"
+  };
+  firebase.initializeApp(config);
+
+	function getpath(){
+	//Ανάκτηση στοιχείων από τη Firebase
+	   firebase.database().ref().once("value", function(data) {
+	   //Ανάκτηση των εγγραφών και μορφοποίηση τους
+	   jsdata=JSON.stringify(data.val().features);
+	   jsdata=jsdata.replace(/\\n/g, "");
+	   jsdata=jsdata.replace(/\\/g, "");
+	   jsdata=jsdata.replace(/\"/g, "");
+		//Εμφάνιση εγγραφών
+	   document.getElementById("area").value=jsdata;  
+    });
+	}
+
+	function getstats(){
+	//Ανάκτηση στοιχείων από τη Firebase
+	   firebase.database().ref().once("value", function(data) {
+	   //Ανάκτηση των εγγραφών και μορφοποίηση τους
+	   jsdata=JSON.stringify(data.val().stats);
+	   jsdata=jsdata.replace(/\\n/g, "");
+	   jsdata=jsdata.replace(/\\/g, "");
+	   jsdata=jsdata.replace(/\"/g, "");
+		//Εμφάνιση εγγραφών
+	   document.getElementById("area").value=jsdata; 
+    });
+	}
+</script>
+</body>
+</html>
