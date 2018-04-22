@@ -20,15 +20,15 @@
                                 width: 100%;
                                 height: 100%;
                         }
-			#help{
-				position: absolute;
-				top:200px;
-				right:5px;
+						#help{
+								position: absolute;
+								top:160px;
+								right:5px;
                                 width: 150px;
-				background-color:red;
-				border-radius: 5px;
+								background-color:red;
+								border-radius: 5px;
                                 color: whitesmoke;
-			}
+						}
                         #inst{
                                 position: absolute;
                                 left: 5px;
@@ -48,7 +48,7 @@
 				background-color:lightblue;
 				border-radius: 5px;
 			}
-			#clearall{
+						#clearall{
 				position: absolute;
 				top:110px;
 				right:5px;
@@ -58,19 +58,19 @@
 			}
                         #surv{
 				position: absolute;
-				top:230px;
+				top:200px;
 				right:5px;
 				background-color: red;
-                                color: whitesmoke;
-                                width: 140px;
-                                height: 60px;
+                color: whitesmoke;
+                width: 140px;
+                height: 80px;
 				border-radius: 5px;
 			}
-			#delast{
+						#delast{
 				position: absolute;
 				top:80px;
 				right:5px;
-                                width: 150px;
+                width: 150px;
 				background-color:lightblue;
 				border-radius: 5px;
 			}
@@ -103,12 +103,12 @@
                         #loc{
                                 height: 40px;
                                 width: 40px;
-				position: absolute;
-				bottom: 40px;
-				right:40px;
-				background-color:white;
-				border-radius: 5px;
-			}
+								position: absolute;
+								bottom: 40px;
+								right:40px;
+								background-color:white;
+								border-radius: 5px;
+						}
                         #smenu{
                                 background-color:lightblue;
                                 border-radius: 4px;
@@ -142,14 +142,14 @@
     <body>
         <div id="map"></div>
 		
-		<button id="save" onclick="savedraw()">Αποθήκευση διαδρομών & σημείων</button>
+		<!--<button id="save" onclick="savedraw()">Αποθήκευση διαδρομών & σημείων</button>-->
 		<button id="help" onclick="help()">Οδηγίες χρήσης</button>
                 <button id="clearall" onclick="clearall()">Διαγραφή όλων</button>
 		<button id="delast" onclick="delast()">Διαγραφή τελευταίου</button>
                 <button id="undob" onclick="undo()"><img src="./theme/default/img/undo.png" alt=""></button>
                 <button id="redob" onclick="redo()"><img src="./theme/default/img/redo.png" alt=""></button>
                 <button id="loc" onclick="Loc()"><img style="height: 24px;width: 24px;" src="./theme/default/img/overview_replacement.gif" alt=""></button>
-                <button id="surv" onclick="surv()">Κλείσιμο και <br>μεταφορά στο ερωτηματολόγιο</button>
+                <button id="surv" onclick="surv()">Αποθήκευση σχεδίων και <br>μεταφορά στο ερωτηματολόγιο</button>
                 
                 <select id="smenu" onchange="sel()">
                     <option selected hidden value="sele">Επιλογή κατηγορίας</option>
@@ -179,18 +179,18 @@
                         <tr><td style="background-color:lightblue;">Επιλογή κατηγορίας</td>
                             <td>Επιλέξτε την κατηγορία διαδρομής ή σημείου που θα σχεδιάσετε</td></tr>                    
                         <tr><td><img src="./theme/default/img/draw_line_off.png" alt=""></td>
-                            <td>Σχεδίαση διαδρομής</td></tr>
+                            <td>Σχεδίαση διαδρομής. Η σχεδίαση ολοκληρώνεται με διπλό κλικ. Για ακύρωση σχεδίασης πατήστε το πλήκτρο [ESC]</td></tr>
                         <tr><td><img src="./theme/default/img/draw_point_off.png" alt=""></td>
                             <td>Σχεδίαση σημείου</td></tr>
                         <tr><td><img src="./theme/default/img/move_feature_off.png" alt=""></td>
-                            <td>Χρησιμοποιείται πριν την αποθήκευση διαδρομών και σημείων για την διορθωσής τους</td></tr>
+                            <td>Χρησιμοποιείται πριν την αποθήκευση διαδρομών και σημείων για την διορθωσής τους.</td></tr>
                         <tr><td><img src="./theme/default/img/pan_off.png" alt=""></td>
                             <td>Απενεργοποίηση των εργαλίων σχεδίασης</td></tr>
                         <tr><td><img src="./theme/default/img/overview_replacement.gif" alt=""></td>
                             <td>Μετάβαση στην τοποθεσία σας. Η τοποθεσία σας ανιχνεύετε από provider σας</td></tr>
                         <tr><td><img src="./theme/default/img/undo.png" alt=""></td>
                             <td>Undo. Διαγραφή τελευταίου σημείου διαδρομής</td></tr>      
-                        <tr><td><img src="./theme/default/img/undo.png" alt=""></td>
+                        <tr><td><img src="./theme/default/img/redo.png" alt=""></td>
                             <td>Redo. Αναίρεση διαγραφής τελευταίου σημείου σε διαδρομή</td></tr> 
                     </table>
                 </div>
@@ -297,7 +297,7 @@ function init() {
             displayClass: 'olControlModifyFeature'
         }),
 	drawpoint,
-        drawpath        
+    drawpath        
     ]);
 	//ορισμός επιπέδου χάρτη OpenStreetMap
 	
