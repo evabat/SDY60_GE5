@@ -153,6 +153,15 @@ table, th {
 			display: none;
 			text-shadow: 2px 2px 4px black;
 }
+#robot{
+			position: absolute;
+			right: 15px;
+			bottom: 250px;
+			z-index: 1001;
+			background-color:white;
+			border-radius: 5px;
+			box-shadow: 3px 3px 4px grey;
+}
 .olControlAttribution {
             font-size: 10px;
             bottom: 5px;
@@ -187,7 +196,7 @@ table, th {
                     
                         <h1 style="cursor:pointer;color:blue;margin: 0; padding: 0;text-align: right;" onclick="help()">&#215;</h1>
                         <table><tr><td>
-									Η εφαρμογή έχει σαν σκοπό την χαρτογράφηση των προσβάσιμων δρόμων στην πόλη σας.
+									Η σελίδα παρουσιάζει μία εφαρμογή που έχει σαν σκοπό την χαρτογράφηση των προσβάσιμων δρόμων στην πόλη σας.
                                     Αφορά διαδρομές και σημεία πρόσβασης όπως διαβάσεις, πεζόδρομους και διόδους που 
                                     μπορούν να χρησιμοποιηθούν για να διευκολύνουν τη διέλευση πεζών, 
                                     ποδηλάτων και ατόμων που χρησιμοποιούν καροτσάκια για τη μετακίνηση τους.
@@ -196,12 +205,17 @@ table, th {
                                     ή ως μονοπάτια με τη χρήση των παρακάτω κουμπιών. Η κάθε διαδρομή και το κάθε σημείο που σχεδιάζετε
 									στο χάρτη έχει αξία για τους ανθρώπους που μπορούν να το χρησιμοποιήσουν και αυτό από την εφαρμογή
 									αποτιμάται σε πόντους για τους οποίους ενημερώνεστε με την αποθήκευση των δεδομένων.
-                                    Μετά το τέλος της εργασίας πιέστε αποθήκευση και καλείστε
+                                    <br>
+									Αυτή η σελίδα απευθύνεται σε χρήστες desktop υπολογιστών για τους χρήστες κινητών υπάρχει αντίστοιχη 
+									<a href="https://drive.google.com/open?id=1Z6qBQB0hYxifQDXXzj0mN8QiEUcpByOg" target="_blank">
+									Android εφαρμογή.</a>
+									<br>Μετά το τέλος της εργασίας πιέστε αποθήκευση και καλείστε
                                     να απαντήσετε στο ερωτηματολόγιο σχετικά με την ευχρηστία της εφαρμογής. 
                                     Την εφαρμογή μπορείτε να την χρησιμοποιήσετε όσες φορές θέλετε 
                                     μέχρι τις 30 Απριλίου που λήγει η περίοδος δοκιμών. 
                                     Το ερωτηματολόγιο παρακαλείστε να το συμπληρώσετε μόνο μία φορά 
                                     όταν θα έχετε ολοκληρωμένη εικόνα της εφαρμογής.
+									
                         </td></tr></table>
                     <table>
                         <tr><td></td>
@@ -222,6 +236,10 @@ table, th {
                         <tr><td><img src="./theme/default/img/redo.png" alt=""></td>
                             <td>Redo. Αναίρεση διαγραφής τελευταίου σημείου σε διαδρομή</td></tr> 
                     </table>
+					<br>Οι εφαρμογές αναπτύχθηκαν στο πλαίσιο εργασίας για την Θεματική ενότητα ΣΔΥ60 του μεταπτυχιακού προγράμματος 
+					<a href="https://www.eap.gr/el/programmata-spoudwn/415-sustima-diaxutou-upologismou/776-sustima-diaxutou-upologismou" target="_blank">
+					"Συστήματα Κινητού και Διάχυτου Υπολογισμού Msc (ΣΔΥ)"</a> του Ελληνικού Ανοικτού Πανεπιστημίου.
+					Η εργασία εκπονείτε από τους Ευαγγελία Μπαλτόγλου, Γιάννη Πριόβολο, Παντελή Ρόδη.				
                 </div>
     <div id="cr">
     <a style="margin: 0; padding: 0;" id="credits2">
@@ -240,6 +258,9 @@ table, th {
 	</div>
 	<h1 id="x" style="cursor:pointer;color:blue;margin: 0; padding: 0;text-align: right;" onclick="hide()">&nbsp;&#215;&nbsp;</h1>
 	<h1 id="inf" style="cursor:pointer;color:blue;margin: 0; padding: 0;text-align: right;" onclick="iicon()"><big>&#9432;</big></h1>
+	
+	<button id="robot" onclick="openw()"><img src="Android_robot.png" alt="Android"></button>
+	 
 <script src="https://www.gstatic.com/firebasejs/4.8.0/firebase.js"></script>
 <script>
   // Αρχικοποίηση Firebase
@@ -290,6 +311,9 @@ table, th {
     var drawpoint=new OpenLayers.Control.DrawFeature(vector, OpenLayers.Handler.Point, {
             displayClass: 'olControlDrawFeaturePoint'		
 	});
+function openw(){
+	window.open("https://drive.google.com/open?id=1Z6qBQB0hYxifQDXXzj0mN8QiEUcpByOg", "_blank");
+}
 function hide(){
 	document.getElementById("cr").style.display='none';
 	document.getElementById("x").style.display='none';
